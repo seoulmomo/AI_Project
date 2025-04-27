@@ -10,6 +10,7 @@ export default function ModelSelectBtn() {
     { id: "gpt-3.5-turbo", name: "GPT-3.5 Turbo" },
     { id: "gpt-4-turbo", name: "GPT-4 Turbo" },
     { id: "gpt-4o", name: "GPT-4o" },
+    { id: "dall-e-3", name: "dall-e-3" },
   ];
 
   const handleModelSelect = (model: string) => {

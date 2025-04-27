@@ -36,33 +36,65 @@ export default function Chat() {
       : "justify-start bg-gray-200 text-gray-800";
   };
 
-  async function handleFormSubmit(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault(); // FormData 방식 대신 FormEvent로 수정 (일반적)
-    if (!input.trim()) return;
+  async function handleFormSubmit(formData: FormData) {
+    const prompt = formData.get("prompt") as string;
+    if (!prompt) return;
 
-    const prompt = input.trim();
-    addMessage("user", prompt);
+    setMessages((prev) => [...prev, { role: "user", content: prompt }]);
     setInput("");
     setIsLoading(true);
-
     try {
-      addMessage("assistant", ""); // 빈 assistant 메시지 미리 추가
+      setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
       const response = await streamChatResponse(prompt, selectedModel);
 
       setMessages((prev) => {
-        const updated = [...prev];
-        const lastIndex = updated.length - 1;
-        if (updated[lastIndex].role === "assistant") {
-          updated[lastIndex].content = response.content;
+        const newMessages = [...prev];
+        // const lastMessage = newMessages[newMessages.length - 1].content;
+        if (newMessages[newMessages.length - 1].content !== "") {
+          return newMessages;
+        } else {
+          newMessages[newMessages.length - 1].content = response.content;
         }
-        return updated;
+        newMessages[newMessages.length - 1].content = response.content;
+
+        return newMessages;
       });
+      console.log("newMessage", messages);
     } catch (error) {
       console.error("Chat error:", error);
     } finally {
       setIsLoading(false);
     }
   }
+
+  // <서버액션 사용 안할시>
+  // async function handleFormSubmit(e: FormEvent<HTMLFormElement>) {
+  //   e.preventDefault(); // FormData 방식 대신 FormEvent로 수정 (일반적)
+  //   if (!input.trim()) return;
+
+  //   const prompt = input.trim();
+  //   addMessage("user", prompt);
+  //   setInput("");
+  //   setIsLoading(true);
+
+  //   try {
+  //     addMessage("assistant", ""); // 빈 assistant 메시지 미리 추가
+  //     const response = await streamChatResponse(prompt, selectedModel);
+
+  //     setMessages((prev) => {
+  //       const updated = [...prev];
+  //       const lastIndex = updated.length - 1;
+  //       if (updated[lastIndex].role === "assistant") {
+  //         updated[lastIndex].content = response.content;
+  //       }
+  //       return updated;
+  //     });
+  //   } catch (error) {
+  //     console.error("Chat error:", error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // }
 
   return (
     <div className="flex flex-col h-[600px] max-w-2xl mx-auto">
@@ -90,7 +122,7 @@ export default function Chat() {
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleFormSubmit} className="p-4 border-t">
+      <form action={handleFormSubmit} className="p-4 border-t">
         <div className="flex gap-2">
           <input
             type="text"
