@@ -54,13 +54,24 @@ export default function ImageGenerator() {
 
   return (
     <div>
+      {imageUrl && (
+        <div className="mb-4">
+          <Image
+            src={imageUrl}
+            alt="Generated content"
+            width={512}
+            height={512}
+            className="rounded-lg"
+          />
+        </div>
+      )}
       <form action={handleSubmit} className="flex gap-4 items-center">
-        <input
+        <textarea
           type="text"
           value={prompt}
           placeholder="이미지 설명을 입력하세요"
           onChange={onChangeText}
-          className="border border-slate-600 px-4 py-2 rounded-md"
+          className="border border-slate-600 px-4 py-2 rounded-md w-[512px]"
           name="prompt"
         />
         <button
@@ -71,17 +82,6 @@ export default function ImageGenerator() {
           {isLoading ? "생성 중" : "이미지 생성"}
         </button>
       </form>
-      {imageUrl && (
-        <div className="mt-4">
-          <Image
-            src={imageUrl}
-            alt="Generated content"
-            width={512}
-            height={512}
-            className="rounded-lg"
-          />
-        </div>
-      )}
     </div>
   );
 }
